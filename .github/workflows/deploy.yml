@@ -1,0 +1,29 @@
+name: Deploy site
+
+on: 
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node build.js                        # builds the site into dist/[cite: 2]
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          name: github-pages                      # 👈 Explicitly naming it 'github-pages' so deploy-pages@v4 finds it
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4             # publishes it[cite: 2]
